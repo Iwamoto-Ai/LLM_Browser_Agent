@@ -1,0 +1,10 @@
+# 共通
+selenium>=4.20
+python-dotenv>=1.0
+
+# スタンドアロン / テンプレート実行 (agent.py, run_template.py) 用
+anthropic>=0.40
+pyyaml>=6.0
+
+# MCP サーバー版 (mcp_server.py) 用
+mcp>=1.2

@@ -1,0 +1,46 @@
+# サイトテンプレートの例
+# このファイルを 1 サイトにつき 1 つ用意して使い回す。
+# 値は {{key}} で参照し、実行時に --values の JSON から埋め込む。
+# パスワード等は {{SECRET:NAME}} と書く（実値は .env / 環境変数から実行時に補完）。
+
+name: 経費登録システム
+start_url: https://example.com/login
+description: 月次の経費を登録し、完了画面を保存する
+
+# --- ログイン手順（不要なら login 節ごと削除） ---
+login:
+  username_field: ユーザーID の入力欄
+  username_value: "{{SECRET:MY_USERNAME}}"
+  password_field: パスワードの入力欄
+  password_value: "{{SECRET:MY_PASSWORD}}"
+  submit: 「ログイン」ボタンをクリックする
+
+# --- フォームまでのメニュー操作（複雑な場合も自然言語で具体的に） ---
+navigation: |
+  上部メニューの「経費管理」にカーソルを合わせ、表示されたサブメニューから「新規登録」を選ぶ。
+  入力フォームが表示されるまで待つ。必要なら下にスクロールして全項目を確認する。
+
+# --- 登録する項目（多いサイトはここに足していく） ---
+# description: 要素を特定するための説明 / value: 入れる値（{{key}} で外部データ参照）
+fields:
+  - label: 交通費
+    description: 「交通費」の金額入力欄
+    value: "{{transport}}"
+  - label: 宿泊費
+    description: 「宿泊費」の金額入力欄
+    value: "{{lodging}}"
+  - label: 日当
+    description: 「日当」の金額入力欄
+    value: "{{per_diem}}"
+  - label: 備考
+    description: 「備考」のテキストエリア
+    value: "{{note}}"
+
+# --- 確定操作 ---
+submit: フォーム下部の「登録」ボタンをクリックする
+
+# --- 成功確認の条件 ---
+verify: 画面に「登録が完了しました」と表示され、一覧に今回の金額が反映されていること
+
+# --- 保存するスクリーンショットのファイル名 ---
+screenshot: expense_done.png

@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "browser-agent": {
+      "command": "python",
+      "args": [
+        "C:\\path\\to\\claude_browser_agent\\mcp_server.py"
+      ],
+      "env": {
+        "BROWSER_AGENT_BROWSER": "edge",
+        "BROWSER_AGENT_HEADLESS": "0",
+        "BROWSER_AGENT_OUTPUT": "C:\\Users\\<you>\\Pictures\\browser-agent",
+        "MY_USERNAME": "your-login-id",
+        "MY_PASSWORD": "your-password"
+      }
+    }
+  }
+}
