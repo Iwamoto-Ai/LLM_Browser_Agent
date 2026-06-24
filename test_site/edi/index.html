@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>練習 購買システム（Practice）</title>
+<style>
+  body { font-family: sans-serif; margin: 0; }
+  .hdr { background: #1414ff; color: #fff; text-align: center; padding: 10px; font-weight: bold; }
+  .yellow { background: #ffd500; min-height: 320px; padding: 24px; color: #333; box-sizing: border-box; }
+  .login { text-align: center; padding: 20px; }
+  .ok { color: #1414ff; font-weight: bold; }
+  input { padding: 2px 4px; }
+  table.cred { margin: 0 auto; }
+  table.cred td { padding: 3px 6px; }
+  .foot { font-size: 11px; color: #999; border-top: 1px solid #ccc; padding: 4px 8px; }
+  .note { font-size: 12px; color: #555; }
+</style>
+</head>
+<body>
+  <div class="hdr">練習 購買システム（Practice / demo）</div>
+  <div class="yellow">
+    <p><b>これは Chrome Recorder の練習用ダミーサイトです。</b>実在の企業・システム・データとは一切関係ありません。</p>
+    <p class="note">フレームセット型のメニュー＋検索フォームと、別ウィンドウのカレンダーを再現しています
+       （iframe・ポップアップの動作確認用）。</p>
+    <p class="note">ログイン: ユーザーID <b>demo</b> ／ パスワード <b>password123</b></p>
+  </div>
+  <div class="login">
+    <p class="ok">ただいま、システムは正常に稼働しています。（練習用）</p>
+    <table class="cred">
+      <tr><td>ユーザーID</td><td><input id="username" autocomplete="off"></td></tr>
+      <tr><td>パスワード</td><td><input id="password" type="password" autocomplete="off"></td></tr>
+    </table>
+    <p>
+      <button id="loginBtn">Login</button>
+      <button id="resetBtn" type="button">Reset</button>
+    </p>
+    <p id="msg" style="color:#c00;"></p>
+  </div>
+  <div class="foot">practice-edi · demo only · no real data</div>
+
+  <script>
+    document.getElementById('loginBtn').addEventListener('click', function () {
+      var u = document.getElementById('username').value;
+      var p = document.getElementById('password').value;
+      if (u === 'demo' && p === 'password123') {
+        location.href = 'home.html';
+      } else {
+        document.getElementById('msg').textContent = 'ユーザーIDまたはパスワードが違います。';
+      }
+    });
+    document.getElementById('resetBtn').addEventListener('click', function () {
+      document.getElementById('username').value = '';
+      document.getElementById('password').value = '';
+      document.getElementById('msg').textContent = '';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<!--
+  LLM Browser Agent — ローカルテスト用サイト
+  ログイン → メニュー → 経費登録（複数の数値入力）→ 登録完了 までを再現する。
+  サーバー不要。 python -m http.server 8000 で配信し http://localhost:8000 を開く。
+  デモ資格情報:  ユーザーID = demo  /  パスワード = password123
+-->
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>経費登録システム（テスト）</title>
+<style>
+  body { font-family: "Segoe UI", "Meiryo", sans-serif; background:#f3f4f6; margin:0; color:#1f2937; }
+  header { background:#1e3a8a; color:#fff; padding:14px 22px; font-size:18px; font-weight:600; }
+  .wrap { max-width:560px; margin:32px auto; background:#fff; border-radius:10px;
+          box-shadow:0 2px 12px rgba(0,0,0,.08); padding:28px; }
+  h2 { margin-top:0; }
+  label { display:block; margin:14px 0 4px; font-weight:600; font-size:14px; }
+  input, textarea { width:100%; box-sizing:border-box; padding:10px; border:1px solid #cbd5e1;
+                    border-radius:6px; font-size:15px; }
+  button { margin-top:20px; background:#2563eb; color:#fff; border:0; border-radius:6px;
+           padding:11px 20px; font-size:15px; font-weight:600; cursor:pointer; }
+  button.secondary { background:#475569; }
+  nav button { margin:6px 8px 0 0; }
+  .menu { display:flex; flex-wrap:wrap; gap:8px; }
+  .menu button { flex:1; min-width:140px; }
+  .err { color:#b91c1c; margin-top:12px; font-size:14px; min-height:18px; }
+  table { width:100%; border-collapse:collapse; margin-top:14px; }
+  th, td { text-align:left; padding:8px 10px; border-bottom:1px solid #e5e7eb; font-size:15px; }
+  .done { color:#15803d; font-size:20px; font-weight:700; }
+  .hidden { display:none; }
+  .badge { display:inline-block; background:#dcfce7; color:#15803d; border-radius:20px;
+           padding:4px 12px; font-size:13px; font-weight:600; }
+</style>
+</head>
+<body>
+<header>経費登録システム <span style="font-weight:400;font-size:13px;">（ローカルテスト）</span></header>
+
+<!-- 1. ログイン画面 -->
+<section id="loginView" class="wrap">
+  <h2>ログイン</h2>
+  <label for="username">ユーザーID</label>
+  <input id="username" name="username" type="text" placeholder="ユーザーID" aria-label="ユーザーID" autocomplete="off">
+  <label for="password">パスワード</label>
+  <input id="password" name="password" type="password" placeholder="パスワード" aria-label="パスワード" autocomplete="off">
+  <button id="loginBtn">ログイン</button>
+  <div class="err" id="loginErr" role="alert"></div>
+  <p style="color:#94a3b8;font-size:12px;margin-top:18px;">demo / password123</p>
+</section>
+
+<!-- 2. メニュー画面 -->
+<section id="menuView" class="wrap hidden">
+  <h2>メニュー</h2>
+  <p>ようこそ、<span id="who"></span> さん</p>
+  <nav class="menu">
+    <button id="menuDashboard" class="secondary">ダッシュボード</button>
+    <button id="menuExpense">経費登録</button>
+    <button id="menuSettings" class="secondary">設定</button>
+  </nav>
+</section>
+
+<!-- 3. 経費登録フォーム -->
+<section id="formView" class="wrap hidden">
+  <h2>経費登録</h2>
+  <label for="transport">交通費</label>
+  <input id="transport" name="transport" type="number" placeholder="円" aria-label="交通費">
+  <label for="lodging">宿泊費</label>
+  <input id="lodging" name="lodging" type="number" placeholder="円" aria-label="宿泊費">
+  <label for="perDiem">日当</label>
+  <input id="perDiem" name="perDiem" type="number" placeholder="円" aria-label="日当">
+  <label for="note">備考</label>
+  <textarea id="note" name="note" rows="2" placeholder="備考" aria-label="備考"></textarea>
+  <button id="submitBtn">登録</button>
+  <button id="backBtn" class="secondary">戻る</button>
+  <div class="err" id="formErr" role="alert"></div>
+</section>
+
+<!-- 4. 登録完了画面 -->
+<section id="doneView" class="wrap hidden">
+  <span class="badge">完了</span>
+  <h2 class="done" id="completeMsg">登録が完了しました</h2>
+  <p>以下の内容で登録しました。</p>
+  <table>
+    <tr><th>項目</th><th>金額 / 内容</th></tr>
+    <tr><td>交通費</td><td id="r_transport"></td></tr>
+    <tr><td>宿泊費</td><td id="r_lodging"></td></tr>
+    <tr><td>日当</td><td id="r_perDiem"></td></tr>
+    <tr><td>備考</td><td id="r_note"></td></tr>
+    <tr><th>合計</th><th id="r_total"></th></tr>
+  </table>
+  <button id="againBtn" class="secondary">続けて登録</button>
+</section>
+
+<script>
+  const show = id => {
+    ['loginView','menuView','formView','doneView']
+      .forEach(v => document.getElementById(v).classList.toggle('hidden', v !== id));
+  };
+  const $ = id => document.getElementById(id);
+
+  // ログイン
+  $('loginBtn').addEventListener('click', () => {
+    const u = $('username').value.trim(), p = $('password').value;
+    if (u === 'demo' && p === 'password123') {
+      $('loginErr').textContent = '';
+      $('who').textContent = u;
+      show('menuView');
+    } else {
+      $('loginErr').textContent = 'ユーザーID またはパスワードが違います。';
+    }
+  });
+
+  // メニュー
+  $('menuExpense').addEventListener('click', () => { $('formErr').textContent=''; show('formView'); });
+  $('menuDashboard').addEventListener('click', () => alert('ダッシュボード（テストのためダミー）'));
+  $('menuSettings').addEventListener('click', () => alert('設定（テストのためダミー）'));
+  $('backBtn').addEventListener('click', () => show('menuView'));
+
+  // 登録
+  $('submitBtn').addEventListener('click', () => {
+    const t = $('transport').value, l = $('lodging').value, d = $('perDiem').value;
+    if (t === '' || l === '' || d === '') {
+      $('formErr').textContent = '交通費・宿泊費・日当は必須です。';
+      return;
+    }
+    const yen = v => Number(v).toLocaleString('ja-JP') + ' 円';
+    $('r_transport').textContent = yen(t);
+    $('r_lodging').textContent   = yen(l);
+    $('r_perDiem').textContent   = yen(d);
+    $('r_note').textContent      = $('note').value || '(なし)';
+    $('r_total').textContent     = yen(Number(t)+Number(l)+Number(d));
+    show('doneView');
+  });
+
+  // 続けて登録
+  $('againBtn').addEventListener('click', () => {
+    ['transport','lodging','perDiem','note'].forEach(id => $(id).value='');
+    show('formView');
+  });
+</script>
+</body>
+</html>

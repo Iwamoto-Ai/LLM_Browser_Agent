@@ -1,0 +1,33 @@
+# ローカルテストサイト用テンプレート
+# 配信:  cd test_site && python -m http.server 8000
+# デモ資格情報を環境変数に設定:  MY_USERNAME=demo  MY_PASSWORD=password123
+name: ローカルテストサイト（経費登録）
+start_url: http://localhost:8000
+
+login:
+  username_field: ユーザーID の入力欄
+  username_value: "{{SECRET:MY_USERNAME}}"
+  password_field: パスワードの入力欄
+  password_value: "{{SECRET:MY_PASSWORD}}"
+  submit: 「ログイン」ボタンをクリックする
+
+navigation: |
+  ログイン後のメニュー画面で「経費登録」ボタンをクリックし、入力フォームを表示する。
+
+fields:
+  - label: 交通費
+    description: 「交通費」の数値入力欄
+    value: "{{transport}}"
+  - label: 宿泊費
+    description: 「宿泊費」の数値入力欄
+    value: "{{lodging}}"
+  - label: 日当
+    description: 「日当」の数値入力欄
+    value: "{{per_diem}}"
+  - label: 備考
+    description: 「備考」のテキストエリア
+    value: "{{note}}"
+
+submit: 「登録」ボタンをクリックする
+verify: 「登録が完了しました」と表示され、入力した金額が一覧（合計含む）に出ていること
+screenshot: test_done.png

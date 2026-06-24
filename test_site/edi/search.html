@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<style>
+  body { font-family: sans-serif; margin: 8px; }
+  .hdr { background: #1414ff; color: #fff; text-align: center; padding: 6px; font-weight: bold; }
+  .tab { background: #9be29b; padding: 4px 8px; }
+  .tab .sel { background: #f3b6c0; padding: 2px 18px; font-weight: bold; }
+  table.f { border-collapse: collapse; margin-top: 8px; }
+  table.f th, table.f td { border: 1px solid #9bd; padding: 4px 6px; }
+  table.f th { background: #bfe0f0; text-align: left; }
+  button { padding: 2px 10px; }
+  #result { margin-top: 12px; }
+  table.r { border-collapse: collapse; width: 100%; }
+  table.r th, table.r td { border: 1px solid #9bd; padding: 4px 6px; font-size: 12px; }
+  table.r th { background: #bfe0f0; }
+</style>
+</head>
+<body>
+  <div class="hdr">検収照会（練習）</div>
+  <div class="tab">メニュー　　<span class="sel">検索</span></div>
+
+  <p>検索キーを入力して下さい。</p>
+  <p><button id="searchBtnTop">検 索</button></p>
+
+  <table class="f">
+    <tr>
+      <th>■年月</th>
+      <td><input id="yyyymm" size="10"> <button id="refBtn" type="button">参照</button></td>
+    </tr>
+    <tr><th>□注文番号</th><td><input size="14"></td></tr>
+    <tr><th>□品名コード</th><td><input size="14"></td></tr>
+  </table>
+
+  <p><button id="searchBtn">検 索</button></p>
+
+  <div id="result"></div>
+
+  <script>
+    function openCalendar() {
+      window.open('calendar.html', 'cal', 'width=480,height=440');
+    }
+    function doSearch() {
+      var ym = document.getElementById('yyyymm').value || '(未指定)';
+      document.getElementById('result').innerHTML =
+        '<div class="hdr">検収照会 結果（練習）</div>' +
+        '<p>1件 Page No.1（検索年月: ' + ym + '）</p>' +
+        '<table class="r"><tr><th>No.</th><th>購買会社</th><th>注文番号</th><th>検収番号</th>' +
+        '<th>品名</th><th>検収日</th><th>検収金額</th><th>税率(%)</th></tr>' +
+        '<tr><td>1</td><td>練習サンプル(株)</td><td>0000000001</td><td>0001-001</td>' +
+        '<td>Practice item (demo) Maintenance Support</td><td>' + ym + '-15</td>' +
+        '<td>1,150,000</td><td>10.0</td></tr></table>';
+    }
+    document.getElementById('refBtn').addEventListener('click', openCalendar);
+    document.getElementById('searchBtn').addEventListener('click', doSearch);
+    document.getElementById('searchBtnTop').addEventListener('click', doSearch);
+  </script>
+</body>
+</html>

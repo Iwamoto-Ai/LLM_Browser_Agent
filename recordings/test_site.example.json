@@ -1,0 +1,60 @@
+{
+  "title": "test_site 経費登録（サンプル録画）",
+  "steps": [
+    {
+      "type": "setViewport",
+      "width": 1280,
+      "height": 1600,
+      "deviceScaleFactor": 1,
+      "isMobile": false,
+      "hasTouch": false,
+      "isLandscape": false
+    },
+    {
+      "type": "navigate",
+      "url": "http://localhost:8000"
+    },
+    {
+      "type": "change",
+      "value": "{{SECRET:MY_USERNAME}}",
+      "selectors": [["#username"], ["xpath///*[@id=\"username\"]"], ["aria/ユーザーID"]]
+    },
+    {
+      "type": "change",
+      "value": "{{SECRET:MY_PASSWORD}}",
+      "selectors": [["#password"], ["xpath///*[@id=\"password\"]"], ["aria/パスワード"]]
+    },
+    {
+      "type": "click",
+      "selectors": [["#loginBtn"], ["xpath///*[@id=\"loginBtn\"]"], ["text/ログイン"]]
+    },
+    {
+      "type": "click",
+      "selectors": [["#menuExpense"], ["xpath///*[@id=\"menuExpense\"]"], ["text/経費登録"]]
+    },
+    {
+      "type": "change",
+      "value": "{{transport}}",
+      "selectors": [["#transport"], ["xpath///*[@id=\"transport\"]"], ["aria/交通費"]]
+    },
+    {
+      "type": "change",
+      "value": "{{lodging}}",
+      "selectors": [["#lodging"], ["xpath///*[@id=\"lodging\"]"], ["aria/宿泊費"]]
+    },
+    {
+      "type": "change",
+      "value": "{{per_diem}}",
+      "selectors": [["#perDiem"], ["xpath///*[@id=\"perDiem\"]"], ["aria/日当"]]
+    },
+    {
+      "type": "change",
+      "value": "{{note}}",
+      "selectors": [["#note"], ["xpath///*[@id=\"note\"]"], ["aria/備考"]]
+    },
+    {
+      "type": "click",
+      "selectors": [["#submitBtn"], ["xpath///*[@id=\"submitBtn\"]"], ["text/登録"]]
+    }
+  ]
+}

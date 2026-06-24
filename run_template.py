@@ -122,8 +122,13 @@ def main() -> None:
     p.add_argument("--template", required=True, help="サイトテンプレート (YAML)")
     p.add_argument("--values", default=None, help="入力値 (JSON)。{{key}} に埋め込む")
     p.add_argument("--browser", choices=["edge", "chrome"], default="edge")
-    p.add_argument("--model", default="claude-sonnet-4-6",
-                   help="難しいサイトは claude-opus-4-8 を推奨")
+    p.add_argument("--engine", choices=["selenium", "playwright"], default="selenium",
+                   help="ブラウザ駆動エンジン（既定: selenium）")
+    p.add_argument("--backend", choices=["anthropic", "ollama"], default="anthropic",
+                   help="頭脳に使う LLM。ollama はローカル・API キー不要")
+    p.add_argument("--model", default=None,
+                   help="モデル名。未指定なら backend ごとの既定"
+                        "（anthropic: claude-sonnet-4-6 / ollama: mistral-nemo）")
     p.add_argument("--max-steps", type=int, default=40, help="最大ステップ数（項目が多いサイトは増やす）")
     p.add_argument("--out-dir", default="output")
     p.add_argument("--dry-run", action="store_true", help="プロンプトを表示するだけで実行しない")
@@ -152,12 +157,17 @@ def main() -> None:
         print(prompt)
         return
 
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        sys.exit("ANTHROPIC_API_KEY が未設定です（.env か環境変数で設定してください）")
+    if args.backend == "ollama":
+        from agent_ollama import run  # ローカル LLM。API キー不要
+        model = args.model or "qwen3:14b"
+    else:
+        if not os.environ.get("ANTHROPIC_API_KEY"):
+            sys.exit("ANTHROPIC_API_KEY が未設定です（.env か環境変数で設定してください）")
+        from agent import run  # ここで初めて anthropic を読み込む
+        model = args.model or "claude-sonnet-4-6"
 
-    from agent import run  # ここで初めて anthropic を読み込む
-    code = run(prompt, tpl.get("start_url"), args.model, args.max_steps,
-               args.headless, args.out_dir, args.browser)
+    code = run(prompt, tpl.get("start_url"), model, args.max_steps,
+               args.headless, args.out_dir, args.browser, args.engine)
     sys.exit(code)
 
 

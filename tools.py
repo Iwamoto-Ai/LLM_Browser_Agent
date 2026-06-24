@@ -86,7 +86,7 @@ TOOLS = [
     },
     {
         "name": "take_screenshot",
-        "description": "現在のページのスクリーンショットを PNG で保存する。",
+        "description": "現在のページのスクリーンショットを PNG で保存する。ファイル名の末尾には自動で日時 (_YYYYMMDD_HHMMSS) が付く。",
         "input_schema": {
             "type": "object",
             "properties": {"filename": {"type": "string", "description": "保存ファイル名（例: result.png）"}},
@@ -127,7 +127,8 @@ def dispatch(name: str, args: dict, browser: Browser, out_dir: str) -> str:
             return f"{msg}\n\n{browser.state()}"
         if name == "take_screenshot":
             import os
-            return browser.screenshot(os.path.join(out_dir, args["filename"]))
+            saved = browser.screenshot(os.path.join(out_dir, args["filename"]))
+            return f"スクリーンショットを保存しました: {saved}"
         if name == "finish":
             return "FINISH"
         return f"未知のツール: {name}"

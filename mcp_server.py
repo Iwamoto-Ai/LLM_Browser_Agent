@@ -21,6 +21,7 @@ Claude Desktop や OpenClaw から、navigate / click / input_text / take_screen
 ブラウザは 1 プロセス内で 1 セッションを保持し、ツール呼び出しをまたいで維持する。
 
 環境変数（claude_desktop_config.json の env で指定可能）:
+  BROWSER_AGENT_ENGINE   selenium | playwright （既定: selenium）
   BROWSER_AGENT_BROWSER  edge | chrome   （既定: edge）
   BROWSER_AGENT_HEADLESS 1 で非表示       （既定: 表示）
   BROWSER_AGENT_OUTPUT   スクショ保存先   （既定: ~/claude_browser_agent_output）
@@ -34,11 +35,11 @@ from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP, Image
 
-from browser import Browser
+from browser_factory import make_browser
 
 mcp = FastMCP("browser-agent")
 
-_browser: Browser | None = None
+_browser = None
 
 
 def _env_bool(name: str, default: bool) -> bool:
@@ -55,12 +56,13 @@ def _output_dir() -> Path:
     return p
 
 
-def _get(create: bool = True) -> Browser:
+def _get(create: bool = True):
     global _browser
     if _browser is None and create:
-        _browser = Browser(
-            browser=os.environ.get("BROWSER_AGENT_BROWSER", "edge"),
-            headless=_env_bool("BROWSER_AGENT_HEADLESS", False),
+        _browser = make_browser(
+            os.environ.get("BROWSER_AGENT_ENGINE", "selenium"),
+            os.environ.get("BROWSER_AGENT_BROWSER", "edge"),
+            _env_bool("BROWSER_AGENT_HEADLESS", False),
         )
     if _browser is None:
         raise RuntimeError("ブラウザが開かれていません。open_browser を呼んでください。")
@@ -68,15 +70,18 @@ def _get(create: bool = True) -> Browser:
 
 
 @mcp.tool()
-def open_browser(browser: str = "edge", headless: bool = False) -> str:
+def open_browser(browser: str = "edge", headless: bool = False,
+                 engine: str = "") -> str:
     """ブラウザを起動する。browser は 'edge'（既定）か 'chrome'。
+    engine は 'selenium'（既定）か 'playwright'（未指定なら環境変数 BROWSER_AGENT_ENGINE）。
     すでに開いている場合は一度閉じてから開き直す。headless=True で画面非表示。"""
     global _browser
     if _browser is not None:
         _browser.quit()
         _browser = None
-    _browser = Browser(browser=browser, headless=headless)
-    return f"{browser} を起動しました（headless={headless}）。"
+    eng = engine or os.environ.get("BROWSER_AGENT_ENGINE", "selenium")
+    _browser = make_browser(eng, browser, headless)
+    return f"{browser} を起動しました（engine={eng}, headless={headless}）。"
 
 
 @mcp.tool()
@@ -130,11 +135,11 @@ def scroll(direction: str = "down", amount: int = 800) -> str:
 @mcp.tool()
 def take_screenshot(filename: str = "screenshot.png") -> Image:
     """現在のページのスクリーンショットを保存し、画像をホスト（Claude）にも返す。
+    ファイル名の末尾には自動で日時 (_YYYYMMDD_HHMMSS) が付く。
     保存先は BROWSER_AGENT_OUTPUT（既定: ~/claude_browser_agent_output）。"""
     b = _get()
-    path = str(_output_dir() / filename)
-    b.screenshot(path)
-    return Image(path=path)
+    saved = b.screenshot(str(_output_dir() / filename))
+    return Image(path=saved)
 
 
 @mcp.tool()

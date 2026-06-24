@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>カレンダー（練習）</title>
+<style>
+  body { font-family: sans-serif; margin: 0; }
+  .hdr { background: #1414ff; color: #fff; text-align: center; padding: 12px; font-weight: bold; font-size: 18px; }
+  .wrap { padding: 20px; text-align: center; }
+  .m { display: inline-block; width: 70px; margin: 6px; padding: 8px 0;
+       border: 1px solid #88f; color: #1414ff; cursor: pointer; text-decoration: underline; }
+  #y { padding: 2px; }
+  .close { margin-top: 16px; padding: 4px 12px; }
+</style>
+</head>
+<body>
+  <div class="hdr">カレンダー（練習）</div>
+  <div class="wrap">
+    <select id="y"><option>2026</option><option>2025</option></select>
+    <button id="selY" type="button">選 択</button>
+    <div id="months" style="margin-top:12px;"></div>
+    <button class="close" id="closeBtn" type="button">閉じる</button>
+  </div>
+
+  <script>
+    var box = document.getElementById('months');
+    for (var i = 1; i <= 12; i++) {
+      (function (m) {
+        var mm = (m < 10 ? '0' : '') + m;
+        var a = document.createElement('span');
+        a.className = 'm';
+        a.id = 'm' + mm;
+        a.textContent = mm + '月';
+        a.addEventListener('click', function () {
+          var y = document.getElementById('y').value;
+          try {
+            if (window.opener && !window.opener.closed) {
+              var el = window.opener.document.getElementById('yyyymm');
+              if (el) { el.value = y + '-' + mm; }
+            }
+          } catch (e) { /* ignore */ }
+          window.close();
+        });
+        box.appendChild(a);
+      })(i);
+    }
+    document.getElementById('closeBtn').addEventListener('click', function () { window.close(); });
+  </script>
+</body>
+</html>
