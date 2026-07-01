@@ -6,8 +6,8 @@
 [![MCP](https://img.shields.io/badge/MCP-Compatible-purple.svg)](https://modelcontextprotocol.io/)
 [![LLM](https://img.shields.io/badge/LLM-Claude_%7C_Ollama-orange.svg)](https://ollama.com/)
 
-ブラウザを操作する DOM（Document Object Model）ベースの自律エージェント。Chrome Recorder対応。**ログイン・検索・スクリーンショット保存**を
-自然言語の指示もできる。**Microsoft Edge（既定）/ Chrome 切替**、**WSL 不要のネイティブ Windows 11** 対応。
+ブラウザを操作する DOM（Document Object Model）ベースの自動化エージェント。Google Chrome Recorder対応。**ログイン・検索・スクリーンショット保存**を
+自然言語の指示もできる。**Microsoft Edge（既定）/ Google Chrome 切替**、**WSL 不要のネイティブ Windows 11** 対応。
 LLM（頭脳）は **クラウド（Anthropic API）** でも **ローカル（Ollama・API キー不要）** でも動く。
 
 > このツールは「画面を画像で見て操作する」方式ではなく、ページ内の**操作可能な要素に番号を振り、その番号で操作する**
@@ -67,7 +67,7 @@ LLM（頭脳）は **クラウド（Anthropic API）** でも **ローカル（O
 ## 🛠️ セットアップ（ネイティブ Windows 11 / WSL 不要）
 
 1. **Python 3.10+** … python.org のインストーラ（"Add python.exe to PATH" にチェック）
-2. **Microsoft Edge** … Windows 11 標準（既定ブラウザ）。Chrome を使う場合のみ別途インストール
+2. **Microsoft Edge** … Windows 11 標準（既定ブラウザ）。Google Chrome を使う場合は別途インストール
 3. WebDriver（msedgedriver / chromedriver）は **Selenium Manager が自動取得**（手動導入不要）
 4. **（ローカル LLM を使う場合）Ollama** … <https://ollama.com/> から導入し `ollama pull qwen3:14b`
 5. **（Playwright を使う場合）** … `pip install playwright`。`channel=msedge` で導入済み Edge を使うため `playwright install` は不要
@@ -192,9 +192,9 @@ mcp_servers:
     args: ["/path/to/LLM-Browser-Agent/mcp_server.py"]
     env:
       BROWSER_AGENT_ENGINE: "selenium"   # playwright も可
-      BROWSER_AGENT_BROWSER: "edge"
+      BROWSER_AGENT_BROWSER: "edge"    # chrome も可
       BROWSER_AGENT_HEADLESS: "0"
-      BROWSER_AGENT_OUTPUT: "/path/to/output"
+      BROWSER_AGENT_OUTPUT: "/path/to/output"   # スクショ保存場所
       MY_USERNAME: "your-login-id"
       MY_PASSWORD: "your-password"
     enabled: true
@@ -296,7 +296,7 @@ python run_template.py --template templates/test_site.yaml --values data/test_va
 記録した操作を **JSON でエクスポート**できる。このツールはその JSON を読み込み、**LLM なしで決定論的に再生**する。
 
 **⚠️ 注意**
-> Recorder の「Playwright 形式エクスポート」は Chrome 拡張機能が必要となる（社内では使えないことが多い）。
+> Chrome Recorder の「Playwright 形式エクスポート」は Chrome 拡張機能が必要となる（社内では使えないことが多い）。
 > **「JSON file」形式**でエクスポートは標準で可能（Chrome 101 以降）。本ツールはこの JSON を直接再生する。
 > 録画を Chrome で行い再生を Edge で行う場合でも基本は同じDOMなので動きますが、もし対象サイトがブラウザ判定で表示内容を変えるようなら、再生も Chrome にすること。
 
@@ -312,10 +312,11 @@ python run_template.py --template templates/test_site.yaml --values data/test_va
 7. エクスポートしたJSONファイルを`recordings/<name>.json` に保存。
 8. エクスポートした JSON の `change` ステップの `value` を、可変の数値は `{{key}}`、ログインID・パスワードは
    `{{SECRET:NAME}}` に書き換える（JSON は人間可読・再インポート可）。
+   
    > **⚠️ 重要（セキュリティ）**: 録画直後の JSON には、録画中に入力した**実値（IDやパスワード）がそのまま残る**。
    > 保存・コミット・共有の前に、必ず `{{SECRET:NAME}}`（秘密）/ `{{key}}`（可変データ）へ置き換えること。
    > 実値は `.env` や環境変数（`MY_USERNAME` / `MY_PASSWORD` など）に置き、JSON には残さない。
-9. 再生する:
+10. 再生する:
 
 ```powershell
 # browser edge
@@ -424,7 +425,7 @@ python run_recording.py --recording recordings/edi_practice_popup.json --values 
 - **Recorder リプレイ**: `recordings/test_site.example.json` で取り込み・値の埋め込み・候補セレクタ解決を確認（`run_recording.py`）。
 - **ページエラー検知（Playwright）**: JS エラー / `console.error` を `state()` の「注意」欄に表示。
 - **MCP サーバー**: Hermes Agent（NousResearch）から接続・ツール検出（9 個）・`navigate` 実行までを確認。
-- 環境: ネイティブ Windows 11 ＋ Microsoft Edge。
+- 環境: ネイティブ Windows 11 ＋ Microsoft Edge および Google Chrome。
 
 ---
 
